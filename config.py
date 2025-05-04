@@ -1,9 +1,6 @@
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
-import chromadb
-from chromadb.utils import embedding_functions
 from typing import List
 
 # Load environment variables
@@ -13,27 +10,45 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel('gemini-2.0-flash')
 
-# Initialize sentence transformer for embeddings
-sentence_transformer = SentenceTransformer('all-MiniLM-L6-v2')
+# Store the model name as a string instead of initializing SentenceTransformer
+sentence_transformer_model = 'all-MiniLM-L6-v2'
 
-# Custom embedding function using sentence-transformers
-class CustomEmbeddingFunction(embedding_functions.EmbeddingFunction):
-    def __call__(self, texts: List[str]) -> List[List[float]]:
-        return sentence_transformer.encode(texts).tolist()
+# Store documents as a string instead of using ChromaDB collection
+documents_data = ""
 
-# Initialize ChromaDB
-chroma_client = chromadb.Client()
-custom_ef = CustomEmbeddingFunction()
+# Store collection documents as a list of strings
+collection_documents = []
 
-# Create or get the collection
-collection = chroma_client.get_or_create_collection(
-    name="angel_one_docs",
-    embedding_function=custom_ef
-)
+# Function to add documents to the collection_documents list
+def add_to_collection(documents, ids=None):
+    """Add documents to the collection_documents list"""
+    global collection_documents
+    collection_documents.extend(documents)
+    return {"count": len(collection_documents)}
 
-documents_data = "";
+# Create a mock collection object with the necessary methods
+class MockCollection:
+    def __init__(self):
+        pass
+        
+    def count(self):
+        """Return the number of documents in the collection"""
+        return len(collection_documents)
+        
+    def add(self, documents, ids=None):
+        """Add documents to the collection"""
+        return add_to_collection(documents, ids)
+        
+    def get(self):
+        """Query the collection"""
+        return {
+            "documents": [collection_documents] if collection_documents else [[]]
+        }
 
-# Add this function at the end of config.py
+# Create a mock collection object
+collection = MockCollection()
+
+# Function to update documents_data
 def update_documents_data(new_data):
     """Update the documents_data variable with new data"""
     global documents_data

@@ -38,12 +38,26 @@ The server will run on http://localhost:8000.
 
 - POST `/api/answer`: Get an answer to a question
 - GET `/api/health`: Health check endpoint
-
+          
 ## Implementation Details
 
-The system uses:
-- ChromaDB for vector storage and similarity search
-- Sentence Transformers for embeddings (all-MiniLM-L6-v2 model)
-- Google's Gemini Pro for answer generation
-- BeautifulSoup4 for web scraping
-- PyPDF2 for PDF processing
+The system uses a simplified Retrieval Augmented Generation (RAG) approach with the following components:
+
+- **Document Storage**: Stores processed document content as plain text for efficient retrieval and context building.
+- **Text Processing**: Custom document processor extracts and chunks text from PDFs, DOCX, and TXT files in the assets folder.
+- **Web Scraping**: Uses BeautifulSoup4 to recursively scrape and extract support content from the Angel One website, with configurable depth via environment variable.
+- **LLM Integration**: Utilizes Google's Gemini Pro model to generate contextually relevant answers based on both document and web-scraped data.
+- **Conversation Management**: Maintains conversation history for each user session, enabling context-aware responses.
+- **API Endpoints**: Exposes endpoints for answering questions, clearing conversation history, and health checks via FastAPI.
+
+## Future Improvements
+
+- **Enhanced Text Processing**: Implement advanced chunking, summarization, and preprocessing for better context management.
+- **Multi-Modal Support**: Add the ability to process and respond to image-based or tabular queries.
+- **Caching Layer**: Introduce caching for frequently asked questions to improve response speed and reduce LLM calls.
+- **Analytics Dashboard**: Develop a dashboard for monitoring usage, popular queries, and system performance.
+- **Custom Training**: Fine-tune the LLM with domain-specific data for improved accuracy and relevance.
+- **Vector Embeddings**: Optionally reintroduce semantic search using vector embeddings for large-scale document sets.
+- **Multilingual Support**: Extend the system to support multiple languages for broader accessibility.
+
+        

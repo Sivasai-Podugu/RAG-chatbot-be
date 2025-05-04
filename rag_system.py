@@ -27,10 +27,7 @@ class RAGSystem:
         """Load all documents from the collection into the complete context"""
         try:
             # Get all documents from the collection
-            results = collection.query(
-                query_texts=["all"],  # Just a placeholder query
-                n_results=collection.count()  # Get all documents
-            )
+            results = collection.get();
             
             if results and results['documents'] and results['documents'][0]:
                 # Join all documents into a single string
