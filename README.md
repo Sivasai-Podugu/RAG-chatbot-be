@@ -22,7 +22,7 @@ GOOGLE_API_KEY=your-api-key-here
 
 # Optional
 PORT=4000                # Port for the server to run on (default: 4000)
-MAX_SCRAPE_LEVELS=3      # Maximum levels of web scraping depth (default: 5)
+MAX_SCRAPE_LEVELS=3      # Maximum levels of web scraping depth (default: 2)
 ```
 
 4. Create an `assets` folder in the backend directory and place your insurance PDFs there.
@@ -38,6 +38,7 @@ The server will run on http://localhost:8000.
 
 - POST `/api/answer`: Get an answer to a question
 - GET `/api/health`: Health check endpoint
+- GET `/api/clear_conversation`: to clear the conversations with ids
           
 ## Implementation Details
 
