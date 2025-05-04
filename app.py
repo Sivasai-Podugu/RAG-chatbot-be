@@ -4,6 +4,7 @@ import uvicorn
 import os
 from models import QuestionRequest, AnswerResponse, ConversationRequest
 from rag_system import RAGSystem
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
