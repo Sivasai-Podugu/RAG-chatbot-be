@@ -17,7 +17,12 @@ pip install -r requirements.txt
 
 3. Create a `.env` file with your Google API key:
 ```
+# Required
 GOOGLE_API_KEY=your-api-key-here
+
+# Optional
+PORT=4000                # Port for the server to run on (default: 4000)
+MAX_SCRAPE_LEVELS=3      # Maximum levels of web scraping depth (default: 5)
 ```
 
 4. Create an `assets` folder in the backend directory and place your insurance PDFs there.

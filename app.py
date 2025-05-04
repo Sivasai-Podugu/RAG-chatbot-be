@@ -5,6 +5,9 @@ import os
 from models import QuestionRequest, AnswerResponse, ConversationRequest
 from rag_system import RAGSystem
 
+# Load environment variables
+load_dotenv()
+
 # Initialize RAG system
 rag_system = RAGSystem()
 
@@ -29,15 +32,26 @@ async def get_answer(request: QuestionRequest):
 
 @app.post("/api/clear-conversation")
 async def clear_conversation(request: ConversationRequest):
-    success = rag_system.clear_conversation(request.conversation_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Conversation not found")
-    return {"status": "success", "message": "Conversation cleared"}
+    results = rag_system.clear_conversations(request.conversation_ids)
+    
+    # Check if any conversations were found and cleared
+    if not any(results.values()):
+        raise HTTPException(status_code=404, detail="None of the specified conversations were found")
+    
+    # Return detailed results
+    return {
+        "status": "success",
+        "message": f"Processed {len(results)} conversation(s)",
+        "details": {
+            "cleared": [id for id, success in results.items() if success],
+            "not_found": [id for id, success in results.items() if not success]
+        }
+    }
 
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8282))
     uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)

@@ -50,14 +50,18 @@ class RAGSystem:
         new_id = str(uuid.uuid4())
         self.conversations[new_id] = []
         return new_id, self.conversations[new_id]
-    
-    def clear_conversation(self, conversation_id):
-        """Clear a specific conversation history"""
-        if conversation_id in self.conversations:
-            self.conversations[conversation_id] = []
-            return True
-        return False
-    
+
+    def clear_conversations(self, conversation_ids):
+        """Clear multiple conversation histories"""
+        results = {}
+        for conversation_id in conversation_ids:
+            if conversation_id in self.conversations:
+                self.conversations[conversation_id] = []
+                results[conversation_id] = True
+            else:
+                results[conversation_id] = False
+        return results
+
     def answer_question(self, query: str, conversation_id=None) -> Dict:
         """Generate an answer using document data, webpage data, and conversation history"""
         try:

@@ -2,10 +2,14 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import PyPDF2
-from typing import List, Set
-from config import collection, documents_data
+from typing import List
+from config import collection, update_documents_data
 import time
 import docx
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 class DocumentProcessor:
     @staticmethod
@@ -87,13 +91,16 @@ class DocumentProcessor:
             # Scrape main page first
             documents.extend(DocumentProcessor.scrape_page(base_url))
             
-            # Find and scrape all linked pages recursively up to 10 levels deep
+            # Find and scrape all linked pages recursively up to the specified levels deep
             visited_urls = set([base_url])
             urls_to_visit = set(DocumentProcessor.find_sub_pages(base_url))
             
             # Track the current level of recursion
             current_level = 1
-            max_levels = 5
+            # Get max_levels from environment variable, default to 5 if not set
+            max_levels = int(os.getenv("MAX_SCRAPE_LEVELS", 5))
+            
+            print(f"Will scrape up to {max_levels} levels deep")
             
             while urls_to_visit and current_level <= max_levels:
                 print(f"Scraping level {current_level} with {len(urls_to_visit)} URLs to visit")
@@ -127,7 +134,22 @@ class DocumentProcessor:
             
             # Process documents (PDF, TXT, DOCX)
             local_documents = DocumentProcessor.process_documents()
-            documents_data.extend(local_documents)
+            
+            # Add local documents to documents_data in config.py
+            if local_documents:
+                # Join all document chunks into a single string
+                local_docs_text = " ".join(local_documents)
+                # Update the documents_data variable using the function
+                update_documents_data(local_docs_text)
+                print(f"Added {len(local_documents)} local document chunks to documents_data")
+            
+            # Add web-scraped documents to collection
+            if documents:
+                collection.add(
+                    documents=documents,
+                    ids=[f"doc_{i}" for i in range(len(documents))]
+                )
+                print(f"Added {len(documents)} web-scraped documents to collection")
             
         except Exception as e:
             print(f"Error processing documents: {e}")

@@ -32,3 +32,9 @@ collection = chroma_client.get_or_create_collection(
 )
 
 documents_data = "";
+
+# Add this function at the end of config.py
+def update_documents_data(new_data):
+    """Update the documents_data variable with new data"""
+    global documents_data
+    documents_data = new_data
